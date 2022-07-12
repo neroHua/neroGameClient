@@ -1,3 +1,7 @@
+import RegisterRequest from "./bean/http/RegisterRequest";
+import UrlConstant from "./constant/UrlConstant";
+import HttpManager from "./net/HttpManager";
+
 const {ccclass, property} = cc._decorator;
 
 @ccclass
@@ -30,11 +34,9 @@ export default class RegisterController extends cc.Component {
         childrenNode[i].getComponent(cc.EditBox).string;
       }
 
-      let loginMessage = {
-        userId: childrenNode[0].getComponent(cc.EditBox).string,
-        password: childrenNode[1].getComponent(cc.EditBox).string,
-        nickName: childrenNode[2].getComponent(cc.EditBox).string,
-      }
+      let loginMessage = new RegisterRequest(childrenNode[0].getComponent(cc.EditBox).string, childrenNode[1].getComponent(cc.EditBox).string, childrenNode[2].getComponent(cc.EditBox).string);
+
+      HttpManager.post(loginMessage, UrlConstant.REGISTER_URL);
 
       console.log(loginMessage, this);
     }
