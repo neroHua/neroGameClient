@@ -17,6 +17,7 @@ export default class HttpManager {
       }
     }
     request.open(HttpManager.GET, HttpServerConfig.HTTP_URL_PRE_FIX + url + '?' + this.beanToURLString(requestBean), true);
+    request.setRequestHeader("Content-type","application/json");
     request.send();
     return JSON.parse(responseText);
   }
@@ -31,6 +32,7 @@ export default class HttpManager {
       }
     }
     request.open(HttpManager.POST, HttpServerConfig.HTTP_URL_PRE_FIX + url, true);
+    request.setRequestHeader("Content-type","application/json");
     request.send(JSON.stringify(requestBean));
     return JSON.parse(responseText);
   }
