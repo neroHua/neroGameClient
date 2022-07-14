@@ -10,17 +10,20 @@ const {ccclass, property} = cc._decorator;
 export default class LoginController extends cc.Component {
 
     onLoad () {
-      let registerMessage = cc.sys.localStorage.getItem(LocalStorageConstant.REGISTER_INFORMATION);
-      if (null!= registerMessage) {
-        let childrenNodeList = this.node.children;
+
+    }
+
+    start () {
+      let registerMessageString : string = cc.sys.localStorage.getItem(LocalStorageConstant.REGISTER_INFORMATION);
+      if (null!= registerMessageString) {
+        let childrenNodeList = this.node.getParent().children;
+        const registerMessage = JSON.parse(registerMessageString);
+        console.log(registerMessage, childrenNodeList)
+
         childrenNodeList[0].getComponent(cc.EditBox).string = registerMessage.userId;
         childrenNodeList[1].getComponent(cc.EditBox).string = registerMessage.password;
         cc.sys.localStorage.removeItem(LocalStorageConstant.REGISTER_INFORMATION);
       }
-    }
-
-    start () {
-
     }
 
     onLogin() {
@@ -34,7 +37,7 @@ export default class LoginController extends cc.Component {
       cc.sys.localStorage.setItem(LocalStorageConstant.USER_INFORMATION, userInformation);
 
       cc.director.loadScene(SceneConstant.HALL_SCENE_URL, () => {
-        console.log('加载登录成功');
+        console.log('加载大厅成功');
       });
     }
 
