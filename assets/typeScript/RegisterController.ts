@@ -1,3 +1,4 @@
+import HttpResponse from "./bean/http/HttpResponse";
 import RegisterRequest from "./bean/http/RegisterRequest";
 import LocalStorageConstant from "./constant/LocalStorageConstant";
 import SceneConstant from "./constant/SceneConstant";
@@ -32,17 +33,23 @@ export default class RegisterController extends cc.Component {
       let parent = this.node.getParent();
       let childrenNode = parent.children;
 
-      let loginMessage = new RegisterRequest(childrenNode[0].getComponent(cc.EditBox).string, childrenNode[1].getComponent(cc.EditBox).string, childrenNode[2].getComponent(cc.EditBox).string);
+      let registerMessage = new RegisterRequest(childrenNode[0].getComponent(cc.EditBox).string, childrenNode[1].getComponent(cc.EditBox).string, childrenNode[2].getComponent(cc.EditBox).string);
 
-      HttpManager.post(loginMessage, UrlConstant.REGISTER_URL);
+      let result : HttpResponse<boolean> = HttpManager.post(registerMessage, UrlConstant.REGISTER_URL);
+      console.log(result);
 
-      cc.sys.localStorage.setItem(LocalStorageConstant.REGISTER_INFORMATION, loginMessage);
+      if (!result.success) {
+        console.log('登录失败', result.errorMessage);
+        return;
+      }
 
-      cc.director.loadScene(SceneConstant.LOGIN_MANAGER_SCENE_URL, () => {
+      cc.sys.localStorage.setItem(LocalStorageConstant.REGISTER_INFORMATION, JSON.stringify(registerMessage));
+
+      cc.director.loadScene(SceneConstant.LOGIN_SCENE_URL, () => {
         console.log('加载登录成功');
       });
 
-      console.log(loginMessage, this);
+      console.log(registerMessage, this);
     }
 
 }
