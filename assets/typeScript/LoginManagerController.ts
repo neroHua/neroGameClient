@@ -16,7 +16,9 @@ export default class LoginManagerController extends cc.Component {
     }
 
     onLogin() {
-
+      cc.director.loadScene(SceneConstant.LOGIN_SCENE_URL, () => {
+        console.log('成功登录注册页');
+      });
     }
 
 }
