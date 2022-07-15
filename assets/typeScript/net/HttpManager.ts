@@ -7,7 +7,7 @@ export default class HttpManager {
   private static readonly GET : string = 'GET';
   private static readonly POST : string = 'POST';
 
-  public static get<M extends HttpRequest, N extends HttpResponse>(requestBean: M, url: string) : N {
+  public static get<M extends HttpRequest, HttpResponse>(requestBean: M, url: string) : HttpResponse {
     let request = new XMLHttpRequest();
     let responseText = null;
     request.onreadystatechange = () => {
@@ -16,13 +16,18 @@ export default class HttpManager {
         console.log(responseText);
       }
     }
-    request.open(HttpManager.GET, HttpServerConfig.HTTP_URL_PRE_FIX + url + '?' + this.beanToURLString(requestBean), false);
+    if (null == requestBean) {
+      request.open(HttpManager.POST, HttpServerConfig.HTTP_URL_PRE_FIX + url, false);
+    }
+    else {
+      request.open(HttpManager.GET, HttpServerConfig.HTTP_URL_PRE_FIX + url + '?' + this.beanToURLString(requestBean), false);
+    }
     request.setRequestHeader("Content-type","application/json");
-    request.send();
+    request.send(null);
     return JSON.parse(responseText);
   }
 
-  public static post<M extends HttpRequest, N extends HttpResponse>(requestBean: M, url: string) : N {
+  public static post<M extends HttpRequest, HttpResponse>(requestBean: M, url: string) : HttpResponse{
     let request = new XMLHttpRequest();
     let responseText = null;
     request.onreadystatechange = () => {
