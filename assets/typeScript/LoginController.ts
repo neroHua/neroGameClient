@@ -1,4 +1,6 @@
+import HttpResponse from "./bean/http/HttpResponse";
 import LoginRequest from "./bean/http/LoginRequest";
+import UserInformationResponse from "./bean/http/UserInformationResponse";
 import LocalStorageConstant from "./constant/LocalStorageConstant";
 import SceneConstant from "./constant/SceneConstant";
 import UrlConstant from "./constant/UrlConstant";
@@ -30,11 +32,13 @@ export default class LoginController extends cc.Component {
       let parent = this.node.getParent();
       let childrenNode = parent.children;
 
-      let loginMessage = new LoginRequest(childrenNode[0].getComponent(cc.EditBox).string, childrenNode[1].getComponent(cc.EditBox).string);
+      let loginRequest = new LoginRequest(childrenNode[0].getComponent(cc.EditBox).string, childrenNode[1].getComponent(cc.EditBox).string);
 
-      let userInformation = HttpManager.post(loginMessage, UrlConstant.LOGIN_URL);
+      let loginResponse : HttpResponse<boolean> = HttpManager.post(loginRequest, UrlConstant.LOGIN_URL);
 
-      cc.sys.localStorage.setItem(LocalStorageConstant.USER_INFORMATION, userInformation);
+      let userInformationResponse : HttpResponse<UserInformationResponse> = HttpManager.get(null, UrlConstant.USER_INFORMATION);
+
+      cc.sys.localStorage.setItem(LocalStorageConstant.USER_INFORMATION, JSON.stringify(userInformationResponse));
 
       cc.director.loadScene(SceneConstant.HALL_SCENE_URL, () => {
         console.log('加载大厅成功');
