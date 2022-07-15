@@ -4,4 +4,6 @@ export default class UrlConstant {
 
   public static readonly LOGIN_URL : string = 'user/login';
 
+  public static readonly USER_INFORMATION : string = 'user/information';
+
 }
