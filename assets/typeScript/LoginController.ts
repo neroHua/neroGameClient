@@ -34,7 +34,8 @@ export default class LoginController extends cc.Component {
 
       let loginRequest = new LoginRequest(childrenNode[0].getComponent(cc.EditBox).string, childrenNode[1].getComponent(cc.EditBox).string);
 
-      let loginResponse : HttpResponse<boolean> = HttpManager.post(loginRequest, UrlConstant.LOGIN_URL);
+      let token: HttpResponse<string> = HttpManager.post(loginRequest, UrlConstant.LOGIN_URL);
+      cc.sys.localStorage.setItem(LocalStorageConstant.TOKEN, token.data);
 
       let userInformationResponse : HttpResponse<UserInformationResponse> = HttpManager.get(null, UrlConstant.USER_INFORMATION);
 
