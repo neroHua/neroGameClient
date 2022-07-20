@@ -8,4 +8,6 @@ export default class UrlConstant {
 
   public static readonly ROOM_CREATE: string = 'room/create';
 
+  public static readonly ROOM_JOIN: string = 'room/join';
+
 }
