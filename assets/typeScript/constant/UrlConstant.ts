@@ -6,4 +6,6 @@ export default class UrlConstant {
 
   public static readonly USER_INFORMATION : string = 'user/information';
 
+  public static readonly ROOM_CREATE: string = 'room/create';
+
 }
