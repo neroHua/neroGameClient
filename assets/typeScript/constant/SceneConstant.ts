@@ -20,4 +20,9 @@ export default class SceneConstant {
    */
   public static readonly HALL_SCENE_URL: string = "scene/hallScene";
 
+  /**
+   * 房间场景
+   */
+  public static readonly ROOM_SCENE_URL: string = "scene/roomScene";
+
 }
