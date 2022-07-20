@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.53125,
-      "y": 0.53125,
+      "x": 0.7624837239583333,
+      "y": 0.7624837239583333,
       "z": 1
     },
     "_quat": {
@@ -76,7 +76,7 @@
     "_level": 1,
     "_components": [
       {
-        "__id__": 11
+        "__id__": 12
       }
     ],
     "_prefab": null,
@@ -228,6 +228,9 @@
     "_components": [
       {
         "__id__": 10
+      },
+      {
+        "__id__": 11
       }
     ],
     "_prefab": null,
@@ -335,7 +338,7 @@
     "_skewY": 0,
     "_zIndex": 0,
     "groupIndex": 0,
-    "_id": "62c6DOq4NCc7MIuyDYnrj1"
+    "_id": "c8DRB+HIFNbogL9XS7qQxn"
   },
   {
     "__type__": "cc.Label",
@@ -360,7 +363,7 @@
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
-    "_id": "afVtdraLBItJZAHf9+JQfd"
+    "_id": "2f0791iFVJXZr6yc2rUnWf"
   },
   {
     "__type__": "cc.PrivateNode",
@@ -421,7 +424,7 @@
     "_skewY": 0,
     "_zIndex": 0,
     "groupIndex": 0,
-    "_id": "eeuh0ffXZEs5YO+8gTyO94"
+    "_id": "25tfhWKLpGyJGXt+a/a1BL"
   },
   {
     "__type__": "cc.Label",
@@ -446,7 +449,7 @@
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
-    "_id": "ecAf1KNmJIcaXMO6vUQBIh"
+    "_id": "049hpYRwpMuL9cd0kUUEv9"
   },
   {
     "__type__": "cc.RichText",
@@ -456,7 +459,7 @@
       "__id__": 5
     },
     "_enabled": true,
-    "_N$string": "<on click='onCreateRoomr'><color=#00ff00>创建房间</c></on><on click='onJoinRoom'><color=#00ffff>加入房间</c></on>",
+    "_N$string": "<on click='onCreateRoom'><color=#00ff00>创建房间</c></on><on click='onJoinRoom'><color=#00ffff>加入房间</c></on>",
     "_N$horizontalAlign": 0,
     "_N$fontSize": 40,
     "_N$font": null,
@@ -465,6 +468,16 @@
     "_N$imageAtlas": null,
     "_N$handleTouchEvent": true,
     "_id": "f9MenXn5pHar91RVKv0SkG"
+  },
+  {
+    "__type__": "3c857ZQNrtF2ajuAl2l3iAA",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 5
+    },
+    "_enabled": true,
+    "_id": "7bK/gH2qVOy5xVktkaiT5c"
   },
   {
     "__type__": "cc.Canvas",
