@@ -17,7 +17,8 @@ export default class RoomController extends cc.Component {
 
     public changePrepareStatus() : void {
       this.prepareStatus = !this.prepareStatus;
-      
+      WebSocketManager.sendMessage("change the status");
+
       let prepareNode : cc.Node = this.node.getChildByName('prepare');
       if (this.prepareStatus) {
         prepareNode.children[0].getComponent(cc.Label).string = "取消准备";
