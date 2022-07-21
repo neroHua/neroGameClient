@@ -9,9 +9,13 @@ export default class WebSocketManager extends cc.Component {
   private static webSocket : WebSocket = null;
 
   public static init() {
-    let userInformation = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
+    let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
+    let userInformation = JSON.parse(userInformationString);
+    console.log(userInformationString);
+    console.log(userInformation, userInformationString);
 
     this.webSocket = new WebSocket(WebSocketConfig.HTTP_URL_PRE_FIX + userInformation.userId);
+
     this.webSocket.onopen = this.onOpen;
     this.webSocket.onclose= this.onClose;
     this.webSocket.onerror= this.onError;
