@@ -39,7 +39,7 @@ export default class LoginController extends cc.Component {
 
       let userInformationResponse : HttpResponse<UserInformationResponse> = HttpManager.get(null, UrlConstant.USER_INFORMATION);
 
-      cc.sys.localStorage.setItem(LocalStorageConstant.USER_INFORMATION, JSON.stringify(userInformationResponse));
+      cc.sys.localStorage.setItem(LocalStorageConstant.USER_INFORMATION, JSON.stringify(userInformationResponse.data));
 
       cc.director.loadScene(SceneConstant.HALL_SCENE_URL, () => {
         console.log('加载大厅成功');
