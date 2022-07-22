@@ -10,8 +10,17 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class HallController extends cc.Component {
 
-    start () {
+    @property(cc.Node)
+    private createRoomButton: cc.Node = null;
 
+    @property(cc.Node)
+    private joinRoomButton: cc.Node = null;
+
+    @property(cc.Node)
+    private joinRoomEditBox: cc.Node = null;
+
+    start () {
+      this.joinRoomEditBox.active = false;
     }
 
     onCreateRoom() {
@@ -27,6 +36,19 @@ export default class HallController extends cc.Component {
     }
 
     onJoinRoom() {
-
+      this.joinRoomEditBox.active = true;
     }
+
+    onInputJoinRoomIdEnd(editBox : cc.EditBox, customEventData : string) {
+      let roomId = this.joinRoomEditBox.getComponent(cc.EditBox).string;
+      cc.sys.localStorage.setItem(LocalStorageConstant.ROOM_ID, roomId);
+
+      let joinRequest = new JoinRequest(Number.parseInt(roomId));
+      let ROOMJoinResponse : HttpResponse<boolean> = HttpManager.post(joinRequest, UrlConstant.ROOM_JOIN);
+
+      cc.director.loadScene(SceneConstant.ROOM_SCENE_URL, () => {
+        console.log('加载房间成功');
+      });
+    }
+
 }
