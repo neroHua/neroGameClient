@@ -10,4 +10,6 @@ export default class UrlConstant {
 
   public static readonly ROOM_JOIN: string = 'room/join';
 
+  public static readonly ROOM_CHANGE_USER_PREPARE_STATUS : string = 'room/changeUserPrepareStatus';
+
 }
