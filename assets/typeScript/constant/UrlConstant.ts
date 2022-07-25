@@ -12,4 +12,6 @@ export default class UrlConstant {
 
   public static readonly ROOM_CHANGE_USER_PREPARE_STATUS : string = 'room/changeUserPrepareStatus';
 
+  public static readonly ROOM_USER_LIST : string = 'room/userList';
+
 }
