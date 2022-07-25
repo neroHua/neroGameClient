@@ -11,8 +11,6 @@ export default class WebSocketManager extends cc.Component {
   public init(onOpen, onClose, onError, onMessage) {
     let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
     let userInformation = JSON.parse(userInformationString);
-    console.log(userInformationString);
-    console.log(userInformation, userInformationString);
 
     this.webSocket = new WebSocket(WebSocketConfig.HTTP_URL_PRE_FIX + userInformation.userId);
 
