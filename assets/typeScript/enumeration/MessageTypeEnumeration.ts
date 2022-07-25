@@ -12,21 +12,23 @@ export default class MessageType {
     this.message = message;
   }
 
-  private getServerMessageName() : string {
+  public getServerMessageName() : string {
     return this.serverMessageName;
   }
 
-  private getCode() : string {
+  public getCode() : string {
     return this.code;
   }
 
-  private getMessage() : string {
+  public getMessage() : string {
     return this.message;
   }
 
 }
 
 export const MessageTypeEnumeration = { 
+  USER_JOIN_ROOM: new MessageType("USER_JOIN_ROOM", "userJoinRoom", "用户加入房间"),
+  USER_LEAVE_ROOM: new MessageType("USER_LEAVE_ROOM", "userLeaveRoom", "用户离开房间"),
   CHANGE_USER_PREPARE_STATUS: new MessageType("CHANGE_USER_PREPARE_STATUS", "changeUserPrepareStatus", "用户改变准备状态"),
   DEAL_CARD: new MessageType("DEAL_CARD", "dealCard", "发牌"),
 }
