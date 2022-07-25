@@ -1,10 +1,13 @@
+import BaseMessage from "./bean/BaseMessage";
 import GameUserMO from "./bean/game/user/GameUserMO";
 import HttpResponse from "./bean/http/HttpResponse";
 import RoomUserInformationResponse from "./bean/http/user/RoomUserInformationResponse";
 import UserChangePreparedStatusRequest from "./bean/http/user/UserChangePreparedStatusRequest";
+import WebSocketConfig from "./config/WebSocketConfig";
 import LocalStorageConstant from "./constant/LocalStorageConstant";
 import UrlConstant from "./constant/UrlConstant";
 import UserConvert from "./convert/UserConvert";
+import { MessageTypeEnumeration } from "./enumeration/MessageTypeEnumeration";
 import HttpManager from "./net/HttpManager";
 import WebSocketManager from "./net/WebSocketManager";
 
@@ -13,17 +16,29 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class RoomController extends cc.Component {
 
-    private webSocketManager : WebSocketManager = null;
+    private webSocket : WebSocket = null;
 
     private userList : Array<GameUserMO>;
 
     private readonly MAX_USER_COUNT : number = 3;
 
     start () {
-      this.webSocketManager = new WebSocketManager();
-      this.webSocketManager.init(this.onOpen, this.onClose, this.onError, this.onMessage);
-
+      this.initWebSocket();
       this.initUserList();
+    }
+    private initWebSocket() {
+      let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
+      let userInformation = JSON.parse(userInformationString);
+  
+      this.webSocket = new WebSocket(WebSocketConfig.HTTP_URL_PRE_FIX + userInformation.userId);
+  
+      let that = this;
+      this.webSocket.onopen = this.onOpen;
+      this.webSocket.onclose = this.onClose;
+      this.webSocket.onerror = this.onError;
+      this.webSocket.onmessage = (message) => {
+        this.onMessage(message);
+      };
     }
 
     private initUserList() : void {
@@ -79,6 +94,26 @@ export default class RoomController extends cc.Component {
 
     public onMessage(message) {
       console.log(message.data, '获得消息');
+      let messageObject = JSON.parse(message.data);
+
+      if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_JOIN_ROOM.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        this.dealUserJoinRoomMessage(userId);
+      } 
+    }
+
+    public dealUserJoinRoomMessage(userId) {
+      let seatIndex = this.userList.length;
+      let gameUserMO : GameUserMO = new GameUserMO(userId);
+      gameUserMO.setPrepared(true);
+      this.userList.push(gameUserMO);
+
+      let userNode = this.node.getChildByName("user" + seatIndex);
+      let userInforMationNode = userNode.getChildByName("userInformation");
+      userInforMationNode.getComponent(cc.Label).string = this.userList[seatIndex].getUserId();
+
+      userNode.active = true;
+      console.log(userNode, this.userList);
     }
 
     public changePrepareStatus() : void {
