@@ -66,7 +66,7 @@ export default class RoomController extends cc.Component {
         userInforMationNode.getComponent(cc.Label).string = this.userList[i].getUserId();
 
         let preparedNode = userNode.getChildByName("prepare");
-        if (this.userList[i].getPrepared) {
+        if (this.userList[i].getPrepared()) {
           preparedNode.children[0].getComponent(cc.Label).string = "取消准备";
         }
         else {
@@ -100,9 +100,14 @@ export default class RoomController extends cc.Component {
         let userId : string = messageObject.userId;
         this.dealUserJoinRoomMessage(userId);
       } 
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.CHANGE_USER_PREPARE_STATUS.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        let prepared : boolean = messageObject.prepared;
+        this.dealChangeUserPrepareStatusMessage(userId, prepared);
+      } 
     }
 
-    public dealUserJoinRoomMessage(userId) {
+    public dealUserJoinRoomMessage(userId : string) {
       let seatIndex = this.userList.length;
       let gameUserMO : GameUserMO = new GameUserMO(userId);
       gameUserMO.setPrepared(true);
@@ -113,7 +118,27 @@ export default class RoomController extends cc.Component {
       userInforMationNode.getComponent(cc.Label).string = this.userList[seatIndex].getUserId();
 
       userNode.active = true;
-      console.log(userNode, this.userList);
+    }
+
+    public dealChangeUserPrepareStatusMessage(userId : string, prepared : boolean) {
+      let gameUserMO : GameUserMO = null;
+      let i = 0;
+      for (; i < this.userList.length; i++) {
+        if (this.userList[i].getUserId() === userId) {
+          break;
+        }
+      }
+      gameUserMO = this.userList[i];
+
+      gameUserMO.setPrepared(prepared);
+      let userNode = this.node.getChildByName("user" + i);
+      let preparedNode = userNode.getChildByName("prepare");
+      if (this.userList[i].getPrepared()) {
+        preparedNode.children[0].getComponent(cc.Label).string = "取消准备";
+      }
+      else {
+        preparedNode.children[0].getComponent(cc.Label).string = "准备";
+      }
     }
 
     public changePrepareStatus() : void {
