@@ -1,4 +1,3 @@
-import BaseMessage from "./bean/BaseMessage";
 import GameUserMO from "./bean/game/user/GameUserMO";
 import HttpResponse from "./bean/http/HttpResponse";
 import RoomUserInformationResponse from "./bean/http/user/RoomUserInformationResponse";
@@ -9,7 +8,6 @@ import UrlConstant from "./constant/UrlConstant";
 import UserConvert from "./convert/UserConvert";
 import { MessageTypeEnumeration } from "./enumeration/MessageTypeEnumeration";
 import HttpManager from "./net/HttpManager";
-import WebSocketManager from "./net/WebSocketManager";
 
 const {ccclass, property} = cc._decorator;
 
@@ -32,7 +30,6 @@ export default class RoomController extends cc.Component {
   
       this.webSocket = new WebSocket(WebSocketConfig.HTTP_URL_PRE_FIX + userInformation.userId);
   
-      let that = this;
       this.webSocket.onopen = this.onOpen;
       this.webSocket.onclose = this.onClose;
       this.webSocket.onerror = this.onError;
@@ -45,7 +42,6 @@ export default class RoomController extends cc.Component {
       let userResponse : HttpResponse<Array<RoomUserInformationResponse>> = HttpManager.get(null, UrlConstant.ROOM_USER_LIST);
       let userListTemp = UserConvert.convertResponseToMOForList(userResponse.data);
 
-      console.log(userResponse);
       let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
       let userInformation = JSON.parse(userInformationString);
       let i = 0;
