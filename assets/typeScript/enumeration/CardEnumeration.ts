@@ -16,19 +16,19 @@ export default class Card {
     this.message = message;
   }
 
-  private getServerCardName() : string {
+  public getServerCardName() : string {
     return this.serverCardName;
   }
 
-  private getCode() : string {
+  public getCode() : string {
     return this.code;
   }
 
-  private getValue() : number {
+  public getValue() : number {
     return this.value;
   }
 
-  private getMessage() : string {
+  public getMessage() : string {
     return this.message;
   }
 
@@ -100,7 +100,7 @@ export const convertServerCardNameToClientCard = (serverCardName : string) : Car
 export const convertServerCardNameListToClientCardList = (serverCardNameList : Array<string>) : Array<Card> => {
   let cardList = new Array(serverCardNameList.length);
   for (let i = 0; i < serverCardNameList.length; i++) {
-    cardList.push(CardEnumeration[serverCardNameList[i]]);
+    cardList[i] = CardEnumeration[serverCardNameList[i]];
   }
   return cardList;
 }
