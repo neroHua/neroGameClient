@@ -156,11 +156,11 @@ export default class RoomController extends cc.Component {
     }
 
     public dealDealCardMessage(cardList : Array<Card>) : void {
+      this.hideAllPrepareButton();
       this.userList[0].setCardList(cardList);
 
       let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
       let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
-      cardListNode.removeAllChildren();
       for (let i = 0; i < cardList.length; i++) {
         let cardNode = new cc.Node();
         cardNode.y = cardListNode.y;
@@ -175,7 +175,6 @@ export default class RoomController extends cc.Component {
       for (let j = 1; j < this.MAX_USER_COUNT; j++) {
         let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
         let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
-        cardListNode.removeAllChildren();
         for (let i = 1; i < cardList.length; i++) {
           let cardNode = new cc.Node();
           cardNode.y = cardListNode.y;
@@ -185,6 +184,22 @@ export default class RoomController extends cc.Component {
 
           cardListNode.addChild(cardNode);
         }
+      }
+    }
+
+    private hideAllPrepareButton() : void {
+      for (let j = 0; j < this.MAX_USER_COUNT; j++) {
+        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+        let prepareNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
+        prepareNode.active = false;
+      }
+    }
+
+    private showAllPrepareButton() : void {
+      for (let j = 0; j < this.MAX_USER_COUNT; j++) {
+        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+        let prepareNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
+        prepareNode.active = true;
       }
     }
 
