@@ -14,19 +14,15 @@ export default class RegisterController extends cc.Component {
     }
 
     onUserIdDidEnd(editBox: cc.EditBox, customerEventData) {
-      console.log(editBox.string, customerEventData);
     }
 
     onPassword1DidEnd(editBox: cc.EditBox, customerEventData) {
-      console.log(editBox.string, customerEventData);
     }
 
     onPassword2DidEnd(editBox: cc.EditBox, customerEventData) {
-      console.log(editBox.string, customerEventData);
     }
     
     onNickNameDidEnd(editBox: cc.EditBox, customerEventData) {
-      console.log(editBox.string, customerEventData);
     }
 
     onRegisterDidEnd() {
@@ -48,8 +44,6 @@ export default class RegisterController extends cc.Component {
       cc.director.loadScene(SceneConstant.LOGIN_SCENE_URL, () => {
         console.log('加载登录成功');
       });
-
-      console.log(registerMessage, this);
     }
 
 }
