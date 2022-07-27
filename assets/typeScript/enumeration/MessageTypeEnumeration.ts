@@ -31,4 +31,8 @@ export const MessageTypeEnumeration = {
   USER_LEAVE_ROOM: new MessageType("USER_LEAVE_ROOM", "userLeaveRoom", "用户离开房间"),
   CHANGE_USER_PREPARE_STATUS: new MessageType("CHANGE_USER_PREPARE_STATUS", "changeUserPrepareStatus", "用户改变准备状态"),
   DEAL_CARD: new MessageType("DEAL_CARD", "dealCard", "发牌"),
+  USER_START_ROB_LANDLORD : new MessageType("USER_START_ROB_LANDLORD", "userStartRobLandlord", "用户开始抢地主消息"),
+  USER_DO_ROB_LANDLORD : new MessageType("USER_DO_ROB_LANDLORD", "userDoRobLandlord", "用户抢地主消息"),
+  USER_DO_NOT_ROB_LANDLORD : new MessageType("USER_DO_NOT_ROB_LANDLORD", "userDoNotRobLandlord", "用户不抢地主消息"),
+  DEAL_LANDLORD_CARD : new MessageType("DEAL_LANDLORD_CARD", "dealLandlordCard", "发地主牌"),
 }
