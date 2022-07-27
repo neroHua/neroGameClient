@@ -14,4 +14,8 @@ export default class UrlConstant {
 
   public static readonly ROOM_USER_LIST : string = 'room/userList';
 
+  public static readonly ROOM_DO_ROB_LANDLORD : string = 'room/doRobLandlord';
+
+  public static readonly ROOM_DO_NOT_ROB_LANDLORD : string = 'room/doNotRobLandlord';
+
 }
