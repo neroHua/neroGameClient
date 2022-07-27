@@ -11,6 +11,7 @@ import UserConvert from "./convert/UserConvert";
 import Card, { CardEnumeration, convertServerCardNameListToClientCardList } from "./enumeration/CardEnumeration";
 import { MessageTypeEnumeration } from "./enumeration/MessageTypeEnumeration";
 import HttpManager from "./net/HttpManager";
+import CardUtil from "./util/CardUtil";
 
 const {ccclass, property} = cc._decorator;
 
@@ -157,6 +158,15 @@ export default class RoomController extends cc.Component {
 
     public dealDealCardMessage(cardList : Array<Card>) : void {
       this.hideAllPrepareButton();
+
+      this.showCardListForMe(cardList);
+      this.showCardListForOther(cardList);
+
+      CardUtil.sortOneCardList(0, cardList.length - 1, cardList);
+      this.showCardListForMe(cardList);
+    }
+
+    public showCardListForMe(cardList : Array<Card>) : void {
       this.userList[0].setCardList(cardList);
 
       let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
@@ -170,20 +180,28 @@ export default class RoomController extends cc.Component {
 
         cardListNode.addChild(cardNode);
       }
-      cardListNode.active = true;
 
+      cardListNode.active = true;
+    }
+
+    public showCardListForOther(cardList : Array<Card>) : void {
       for (let j = 1; j < this.MAX_USER_COUNT; j++) {
+        let otherCardList : Array<Card> = CardUtil.generateOtherUserCard(cardList);
+        this.userList[j].setCardList(otherCardList);
+
         let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
         let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
-        for (let i = 1; i < cardList.length; i++) {
+        for (let i = 1; i < otherCardList.length; i++) {
           let cardNode = new cc.Node();
           cardNode.y = cardListNode.y;
 
           let cardSprite : cc.Sprite = cardNode.addComponent(cc.Sprite);
-          cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(CardEnumeration.CARD_500.getCode());
+          cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(otherCardList[i].getCode());
 
           cardListNode.addChild(cardNode);
         }
+
+        cardListNode.active = true;
       }
     }
 
