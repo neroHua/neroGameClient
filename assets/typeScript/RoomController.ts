@@ -171,6 +171,7 @@ export default class RoomController extends cc.Component {
 
       let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
       let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
+      cardListNode.removeAllChildren();
       for (let i = 0; i < cardList.length; i++) {
         let cardNode = new cc.Node();
         cardNode.y = cardListNode.y;
@@ -191,6 +192,7 @@ export default class RoomController extends cc.Component {
 
         let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
         let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
+        cardListNode.removeAllChildren();
         for (let i = 1; i < otherCardList.length; i++) {
           let cardNode = new cc.Node();
           cardNode.y = cardListNode.y;
