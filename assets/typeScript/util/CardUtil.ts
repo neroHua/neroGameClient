@@ -38,7 +38,7 @@ export default class CardUtil {
     for (let i = 0; i < cardList.length; i++) {
       otherUserCard.push(CardEnumeration.CARD_500);
     }
-    return cardList;
+    return otherUserCard;
   }
 
 }
