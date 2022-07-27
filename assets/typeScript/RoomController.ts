@@ -82,6 +82,16 @@ export default class RoomController extends cc.Component {
         let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
         userNode.active = false;
       }
+
+      this.hideAllRobLandlordButton();
+    }
+
+    private hideAllRobLandlordButton() : void {
+      for (let j = 0; j < this.MAX_USER_COUNT; j++) {
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+        let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+        robLandlordNode.active = false;
+      }
     }
 
     private initCardAtlas() {
@@ -120,6 +130,10 @@ export default class RoomController extends cc.Component {
         let cardList : Array<Card> = convertServerCardNameListToClientCardList(cardEnumerationList);
         this.dealDealCardMessage(cardList);
       } 
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_START_ROB_LANDLORD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        this.dealUserStartRobLandlordMessage(userId);
+      }
     }
 
     public dealUserJoinRoomMessage(userId : string) : void {
@@ -209,17 +223,30 @@ export default class RoomController extends cc.Component {
 
     private hideAllPrepareButton() : void {
       for (let j = 0; j < this.MAX_USER_COUNT; j++) {
-        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
         let prepareNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
         prepareNode.active = false;
       }
     }
 
-    private showAllPrepareButton() : void {
-      for (let j = 0; j < this.MAX_USER_COUNT; j++) {
-        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
-        let prepareNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
-        prepareNode.active = true;
+    private dealUserStartRobLandlordMessage(userId : string) : void {
+      let i = 0;
+      for (; i < this.userList.length; i++) {
+        if (this.userList[i].getUserId() === userId) {
+          break;
+        }
+      }
+
+      if (i === 0) {
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+        let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+        robLandlordNode.active = true;
+      }
+      else {
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+        let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+        robLandlordNode.children[0].getComponent(cc.Label).string = RoomConstant.IN_ROB_LANDLORD;
+        robLandlordNode.active = true;
       }
     }
 
@@ -229,7 +256,7 @@ export default class RoomController extends cc.Component {
       HttpManager.post(userChangePreparedStatusRequest, UrlConstant.ROOM_CHANGE_USER_PREPARE_STATUS);
 
       this.userList[0].setPrepared(!oldPrepared);
-      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
       let preparedNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
       if (!oldPrepared) {
         preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_YES;
@@ -237,6 +264,22 @@ export default class RoomController extends cc.Component {
       else {
         preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_NO;
       }
+    }
+
+    public doRobLandlord() : void {
+      HttpManager.post(null, UrlConstant.ROOM_DO_ROB_LANDLORD);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+      robLandlordNode.children[1].active = false;
+    }
+
+    public doNotRobLandlord() : void {
+      HttpManager.post(null, UrlConstant.ROOM_DO_NOT_ROB_LANDLORD);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+      robLandlordNode.children[0].active = false;
     }
 
 }
