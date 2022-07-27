@@ -134,6 +134,20 @@ export default class RoomController extends cc.Component {
         let userId : string = messageObject.userId;
         this.dealUserStartRobLandlordMessage(userId);
       }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_DO_ROB_LANDLORD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        this.dealUserDoRobLandlordMessage(userId);
+      }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_DO_NOT_ROB_LANDLORD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        this.dealUserDoNotRobLandlordMessage(userId);
+      }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.DEAL_LANDLORD_CARD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        let cardEnumerationList : Array<string> = messageObject.cardEnumerationList;
+        let cardList : Array<Card> = convertServerCardNameListToClientCardList(cardEnumerationList);
+        this.dealDealLandlordCardMessage(userId, cardList);
+      }
     }
 
     public dealUserJoinRoomMessage(userId : string) : void {
@@ -149,14 +163,19 @@ export default class RoomController extends cc.Component {
       userNode.active = true;
     }
 
-    public dealChangeUserPrepareStatusMessage(userId : string, prepared : boolean) : void {
-      let gameUserMO : GameUserMO = null;
-      let i = 0;
-      for (; i < this.userList.length; i++) {
+    public findUserIndexInUserListByUserId(userId : string) : number {
+      for (let i = 0; i < this.userList.length; i++) {
         if (this.userList[i].getUserId() === userId) {
-          break;
+          return i;
         }
       }
+
+      return null;
+    }
+
+    public dealChangeUserPrepareStatusMessage(userId : string, prepared : boolean) : void {
+      let gameUserMO : GameUserMO = null;
+      let i = this.findUserIndexInUserListByUserId(userId);
       gameUserMO = this.userList[i];
 
       gameUserMO.setPrepared(prepared);
@@ -199,29 +218,33 @@ export default class RoomController extends cc.Component {
       cardListNode.active = true;
     }
 
-    public showCardListForOther(cardList : Array<Card>) : void {
+    public showCardListForAllOther(cardList : Array<Card>) : void {
       for (let j = 1; j < this.MAX_USER_COUNT; j++) {
-        let otherCardList : Array<Card> = CardUtil.generateOtherUserCard(cardList);
-        this.userList[j].setCardList(otherCardList);
-
-        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
-        let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
-        cardListNode.removeAllChildren();
-        for (let i = 1; i < otherCardList.length; i++) {
-          let cardNode = new cc.Node();
-          cardNode.y = cardListNode.y;
-
-          let cardSprite : cc.Sprite = cardNode.addComponent(cc.Sprite);
-          cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(otherCardList[i].getCode());
-
-          cardListNode.addChild(cardNode);
-        }
-
-        cardListNode.active = true;
+        this.showCardListForOther(cardList, j);
       }
     }
 
-    private hideAllPrepareButton() : void {
+    public showCardListForOther(cardList : Array<Card>, j : number) : void {
+      let otherCardList : Array<Card> = CardUtil.generateOtherUserCard(cardList);
+      this.userList[j].setCardList(otherCardList);
+
+      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+      let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
+      cardListNode.removeAllChildren();
+      for (let i = 1; i < otherCardList.length; i++) {
+        let cardNode = new cc.Node();
+        cardNode.y = cardListNode.y;
+
+        let cardSprite : cc.Sprite = cardNode.addComponent(cc.Sprite);
+        cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(otherCardList[i].getCode());
+
+        cardListNode.addChild(cardNode);
+      }
+
+      cardListNode.active = true;
+    }
+
+    public hideAllPrepareButton() : void {
       for (let j = 0; j < this.MAX_USER_COUNT; j++) {
         let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
         let prepareNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
@@ -229,7 +252,7 @@ export default class RoomController extends cc.Component {
       }
     }
 
-    private dealUserStartRobLandlordMessage(userId : string) : void {
+    public dealUserStartRobLandlordMessage(userId : string) : void {
       let i = 0;
       for (; i < this.userList.length; i++) {
         if (this.userList[i].getUserId() === userId) {
@@ -248,6 +271,63 @@ export default class RoomController extends cc.Component {
         robLandlordNode.children[0].getComponent(cc.Label).string = RoomConstant.IN_ROB_LANDLORD;
         robLandlordNode.active = true;
       }
+    }
+
+    public dealUserDoRobLandlordMessage(userId : string) : void {
+      let i = this.findUserIndexInUserListByUserId(userId);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+      robLandlordNode.children[0].getComponent(cc.Label).string = RoomConstant.DO_ROB_LANDLORD;
+      robLandlordNode.active = true;
+    }
+
+    public dealUserDoNotRobLandlordMessage(userId : string) : void {
+      let i = this.findUserIndexInUserListByUserId(userId);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+      robLandlordNode.children[0].getComponent(cc.Label).string = RoomConstant.DO_NOT_ROB_LANDLORD;
+      robLandlordNode.active = true;
+    }
+
+    public dealDealLandlordCardMessage(userId : string, cardList : Array<Card>) : void {
+      CardUtil.sortOneCardList(0, cardList.length - 1, cardList);
+
+      this.showLandlordCardList(cardList);
+
+      let i = this.findUserIndexInUserListByUserId(userId);
+
+      if (i === 0) {
+        let userCardList = this.userList[0].getCardList();
+        cardList.forEach( element => {
+          userCardList.push(element);
+        });
+        CardUtil.sortOneCardList(0, userCardList.length - 1, userCardList);
+        this.showCardListForMe(userCardList);
+      }
+      else {
+        let userCardList = this.userList[0].getCardList();
+        cardList.forEach( element => {
+          userCardList.push(element);
+        });
+        this.showCardListForOther(userCardList, i);
+      }
+    }
+
+    public showLandlordCardList(cardList : Array<Card>) : void {
+      let landlordCardListNode : cc.Node = this.node.getChildByName(RoomConstant.LANDLORD_CARD_LIST_NODE_NAME);
+      landlordCardListNode.removeAllChildren();
+      for (let i = 1; i < cardList.length; i++) {
+        let cardNode = new cc.Node();
+        cardNode.y = landlordCardListNode.y;
+
+        let cardSprite : cc.Sprite = cardNode.addComponent(cc.Sprite);
+        cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(cardList[i].getCode());
+
+        landlordCardListNode.addChild(cardNode);
+      }
+      landlordCardListNode.active = true;
     }
 
     public changePrepareStatus() : void {
