@@ -40,7 +40,7 @@ export default class HttpManager extends cc.Component {
     }
     request.open(HttpManager.POST, HttpServerConfig.HTTP_URL_PRE_FIX + url, false);
     request.setRequestHeader("Content-type","application/json");
-    request.setRequestHeader("token", cc.sys.localStorage.getItem("token"));
+    request.setRequestHeader(LocalStorageConstant.TOKEN, cc.sys.localStorage.getItem(LocalStorageConstant.TOKEN));
     request.send(JSON.stringify(requestBean));
     return JSON.parse(responseText);
   }
