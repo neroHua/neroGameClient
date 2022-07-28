@@ -313,7 +313,7 @@ export default class RoomController extends cc.Component {
     public showLandlordCardList(cardList : Array<Card>) : void {
       let landlordCardListNode : cc.Node = this.node.getChildByName(RoomConstant.LANDLORD_CARD_LIST_NODE_NAME);
       landlordCardListNode.removeAllChildren();
-      for (let i = 1; i < cardList.length; i++) {
+      for (let i = 0; i < cardList.length; i++) {
         let cardNode = new cc.Node();
         cardNode.y = landlordCardListNode.y;
 
