@@ -1165,7 +1165,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 700,
+      "width": 800,
       "height": 159
     },
     "_anchorPoint": {
@@ -1175,7 +1175,7 @@
     },
     "_position": {
       "__type__": "cc.Vec3",
-      "x": -5,
+      "x": 40,
       "y": -223,
       "z": 0
     },
@@ -1238,7 +1238,7 @@
     "_enabled": true,
     "_layoutSize": {
       "__type__": "cc.Size",
-      "width": 700,
+      "width": 800,
       "height": 159
     },
     "_resize": 2,
@@ -2365,7 +2365,7 @@
     "_N$paddingRight": 0,
     "_N$paddingTop": 0,
     "_N$paddingBottom": 0,
-    "_N$spacingX": -100,
+    "_N$spacingX": -102,
     "_N$spacingY": 0,
     "_N$verticalDirection": 1,
     "_N$horizontalDirection": 0,
@@ -3139,7 +3139,7 @@
     "_N$paddingRight": 0,
     "_N$paddingTop": 0,
     "_N$paddingBottom": 0,
-    "_N$spacingX": -100,
+    "_N$spacingX": -102,
     "_N$spacingY": 0,
     "_N$verticalDirection": 1,
     "_N$horizontalDirection": 0,
@@ -3497,13 +3497,13 @@
       "width": 348,
       "height": 159
     },
-    "_resize": 0,
-    "_N$layoutType": 1,
+    "_resize": 2,
+    "_N$layoutType": 3,
     "_N$padding": 0,
     "_N$cellSize": {
       "__type__": "cc.Size",
-      "width": 40,
-      "height": 40
+      "width": 116,
+      "height": 159
     },
     "_N$startAxis": 0,
     "_N$paddingLeft": 0,
