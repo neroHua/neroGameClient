@@ -253,12 +253,7 @@ export default class RoomController extends cc.Component {
     }
 
     public dealUserStartRobLandlordMessage(userId : string) : void {
-      let i = 0;
-      for (; i < this.userList.length; i++) {
-        if (this.userList[i].getUserId() === userId) {
-          break;
-        }
-      }
+      let i = this.findUserIndexInUserListByUserId(userId);
 
       if (i === 0) {
         let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
@@ -266,7 +261,7 @@ export default class RoomController extends cc.Component {
         robLandlordNode.active = true;
       }
       else {
-        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
         let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
         robLandlordNode.children[0].getComponent(cc.Label).string = RoomConstant.IN_ROB_LANDLORD;
         robLandlordNode.active = true;
