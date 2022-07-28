@@ -193,7 +193,7 @@ export default class RoomController extends cc.Component {
       this.hideAllPrepareButton();
 
       this.showCardListForMe(cardList);
-      this.showCardListForOther(cardList);
+      this.showCardListForAllOther(cardList);
 
       CardUtil.sortOneCardList(0, cardList.length - 1, cardList);
       this.showCardListForMe(cardList);
