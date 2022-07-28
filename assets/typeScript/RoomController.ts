@@ -6,6 +6,7 @@ import WebSocketConfig from "./config/WebSocketConfig";
 import LocalStorageConstant from "./constant/LocalStorageConstant";
 import ResourceConstant from "./constant/ResourceConstant";
 import RoomConstant from "./constant/RoomConstant";
+import SceneConstant from "./constant/SceneConstant";
 import UrlConstant from "./constant/UrlConstant";
 import UserConvert from "./convert/UserConvert";
 import Card, { CardEnumeration, convertServerCardNameListToClientCardList } from "./enumeration/CardEnumeration";
@@ -48,42 +49,56 @@ export default class RoomController extends cc.Component {
 
     private initUserList() : void {
       let userResponse : HttpResponse<Array<RoomUserInformationResponse>> = HttpManager.get(null, UrlConstant.ROOM_USER_LIST);
-      let userListTemp = UserConvert.convertResponseToMOForList(userResponse.data);
+      this.userList = UserConvert.convertResponseToMOForList(userResponse.data);
 
-      let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
-      let userInformation = JSON.parse(userInformationString);
-      let i = 0;
-      for (; i < userListTemp.length; i++) {
-        if (userListTemp[i].getUserId() === userInformation.userId) {
-          break;
+      this.rearrangeUserSeat();
+    }
+
+  private rearrangeUserSeat() {
+    let meIndex = this.findMeIndexInUserList();
+
+    let i: number = 0;
+    for (i = 0; i < this.userList.length; i++) {
+      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
+      console.log(userNode);
+      let userInforMationNode = userNode.getChildByName(RoomConstant.USER_INFORMATION_NODE_NAME);
+      userInforMationNode.getComponent(cc.Label).string = this.userList[i].getUserId();
+
+      let preparedNode = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
+      if (this.userList[i].getPrepared()) {
+        preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_YES;
+      }
+      else {
+        preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_NO;
+      }
+    }
+
+    for (; i < this.MAX_USER_COUNT; i++) {
+      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
+      userNode.active = false;
+    }
+
+    this.hideAllRobLandlordButton();
+  }
+
+  private findMeIndexInUserList() : number {
+    let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
+    let userInformation = JSON.parse(userInformationString);
+    return this.findUserIndexInUserListByUserId(userInformation.userId);
+  }
+
+    public findUserIndexInUserListByUserId(userId : string) : number {
+      for (let i = 0; i < this.userList.length; i++) {
+        if (this.userList[i].getUserId() === userId) {
+          return i;
         }
       }
 
-      this.userList = userListTemp.splice(i);
-      userListTemp.forEach(element => {
-        this.userList.push(element);
-      });
+      return null;
+    }
 
-      for (i = 0; i < this.userList.length; i++) {
-        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
-        let userInforMationNode = userNode.getChildByName(RoomConstant.USER_INFORMATION_NODE_NAME);
-        userInforMationNode.getComponent(cc.Label).string = this.userList[i].getUserId();
-
-        let preparedNode = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
-        if (this.userList[i].getPrepared()) {
-          preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_YES;
-        }
-        else {
-          preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_NO;
-        }
-      }
-
-      for (; i < this.MAX_USER_COUNT; i++) {
-        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
-        userNode.active = false;
-      }
-
-      this.hideAllRobLandlordButton();
+    private calculateSeatIndexByMeIndex(i : number, meIndex : number) : number {
+      return (i - meIndex + 3) % 3;
     }
 
     private hideAllRobLandlordButton() : void {
@@ -120,6 +135,10 @@ export default class RoomController extends cc.Component {
         let userId : string = messageObject.userId;
         this.dealUserJoinRoomMessage(userId);
       } 
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_LEAVE_ROOM.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        this.dealUserLeaveRoomMessage(userId);
+      } 
       else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.CHANGE_USER_PREPARE_STATUS.getServerMessageName()) {
         let userId : string = messageObject.userId;
         let prepared : boolean = messageObject.prepared;
@@ -151,26 +170,24 @@ export default class RoomController extends cc.Component {
     }
 
     public dealUserJoinRoomMessage(userId : string) : void {
-      let seatIndex = this.userList.length;
+      let index = this.userList.length;
       let gameUserMO : GameUserMO = new GameUserMO(userId);
       gameUserMO.setPrepared(true);
       this.userList.push(gameUserMO);
+      let meIndex = this.findMeIndexInUserList();
 
-      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
+      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(index, meIndex));
       let userInforMationNode = userNode.getChildByName(RoomConstant.USER_INFORMATION_NODE_NAME);
-      userInforMationNode.getComponent(cc.Label).string = this.userList[seatIndex].getUserId();
+      userInforMationNode.getComponent(cc.Label).string = userId;
 
       userNode.active = true;
     }
 
-    public findUserIndexInUserListByUserId(userId : string) : number {
-      for (let i = 0; i < this.userList.length; i++) {
-        if (this.userList[i].getUserId() === userId) {
-          return i;
-        }
-      }
+    public dealUserLeaveRoomMessage(userId : string) : void {
+      let seatIndex = this.findUserIndexInUserListByUserId(userId);
+      this.userList.splice(seatIndex, 1);
 
-      return null;
+      this.rearrangeUserSeat();
     }
 
     public dealChangeUserPrepareStatusMessage(userId : string, prepared : boolean) : void {
@@ -355,6 +372,14 @@ export default class RoomController extends cc.Component {
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
       let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
       robLandlordNode.children[0].active = false;
+    }
+
+    public leaveThisRoom() : void {
+      HttpManager.post(null, UrlConstant.ROOM_LEAVE);
+      cc.sys.localStorage.removeItem(LocalStorageConstant.ROOM_ID);
+      cc.director.loadScene(SceneConstant.HALL_SCENE_URL, () => {
+        console.log('离开房间成功');
+      });
     }
 
 }
