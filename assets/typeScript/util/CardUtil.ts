@@ -1,7 +1,6 @@
 import Card, { CardEnumeration } from "../enumeration/CardEnumeration";
 
 export default class CardUtil {
-
   public static sortOneCardList(start : number, end : number, cardList : Array<Card>) : void {
     if (start >= end) {
         return;
@@ -39,6 +38,10 @@ export default class CardUtil {
       otherUserCard.push(CardEnumeration.CARD_500);
     }
     return otherUserCard;
+  }
+
+  public static canNotPlayThisCard(cardList: Card[], lastCardList: Card[]) : boolean {
+    return false;
   }
 
 }
