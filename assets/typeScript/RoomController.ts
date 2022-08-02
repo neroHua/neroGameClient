@@ -1,7 +1,9 @@
+import RoundMO from "./bean/game/round/RoundMO";
 import GameUserMO from "./bean/game/user/GameUserMO";
 import HttpResponse from "./bean/http/HttpResponse";
 import RoomUserInformationResponse from "./bean/http/user/RoomUserInformationResponse";
 import UserChangePreparedStatusRequest from "./bean/http/user/UserChangePreparedStatusRequest";
+import UserPlayCardRequest from "./bean/http/user/UserPlayCardRequest";
 import WebSocketConfig from "./config/WebSocketConfig";
 import LocalStorageConstant from "./constant/LocalStorageConstant";
 import ResourceConstant from "./constant/ResourceConstant";
@@ -9,7 +11,7 @@ import RoomConstant from "./constant/RoomConstant";
 import SceneConstant from "./constant/SceneConstant";
 import UrlConstant from "./constant/UrlConstant";
 import UserConvert from "./convert/UserConvert";
-import Card, { CardEnumeration, convertServerCardNameListToClientCardList } from "./enumeration/CardEnumeration";
+import Card, { CardEnumeration, convertClientCardListToServerCardNameList, convertCodeListToClientCardList, convertServerCardNameListToClientCardList } from "./enumeration/CardEnumeration";
 import { MessageTypeEnumeration } from "./enumeration/MessageTypeEnumeration";
 import HttpManager from "./net/HttpManager";
 import CardUtil from "./util/CardUtil";
@@ -26,6 +28,10 @@ export default class RoomController extends cc.Component {
     private readonly MAX_USER_COUNT : number = 3;
 
     private cardAtlas: cc.SpriteAtlas = null;
+
+    private roundMO : RoundMO = null;
+
+    private playCardSet: Set<cc.Node> = new Set();
 
     start () {
       this.initWebSocket();
@@ -253,6 +259,17 @@ export default class RoomController extends cc.Component {
 
         let cardSprite : cc.Sprite = cardNode.addComponent(cc.Sprite);
         cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(cardList[i].getCode());
+        
+        cardNode.on(cc.Node.EventType.TOUCH_START, (event : cc.Event) => {
+          if (this.playCardSet.has(cardNode)) {
+            this.playCardSet.delete(cardNode);
+            cardNode.color = cc.Color.WHITE;
+          }
+          else {
+            this.playCardSet.add(cardNode);
+            cardNode.color = cc.Color.MAGENTA;
+          }
+        })
 
         cardListNode.addChild(cardNode);
       }
@@ -372,6 +389,13 @@ export default class RoomController extends cc.Component {
     }
 
     public dealUserStartToPlayCardMessage(userId : string) : void {
+      if (null == this.roundMO || this.roundMO.thisRoundFinish(this.MAX_USER_COUNT)) {
+        this.roundMO = new RoundMO(userId);
+      }
+      else {
+        this.roundMO.setCurrentTurnUserId(userId);
+      }
+
       let seatIndex = this.findUserSeatIndexInUserListByUserId(userId);
 
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
@@ -419,4 +443,48 @@ export default class RoomController extends cc.Component {
       });
     }
 
+    public doPlayCard() : void {
+      let cardList : Array<Card> = this.getPlayCardList();
+      let lastCardList : Array<Card> = this.roundMO.getLastPlayCard();
+
+      if (CardUtil.canNotPlayThisCard(cardList, lastCardList)) {
+        return;
+      }
+
+      let serverCardNameList : Array<string> = convertClientCardListToServerCardNameList(cardList);
+      let userPlayCardRequest : UserPlayCardRequest = new UserPlayCardRequest(serverCardNameList);
+      HttpManager.post(userPlayCardRequest, UrlConstant.ROOM_DO_PLAY_CARD);
+      this.removePlayCardList();
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+      robLandlordNode.children[1].active = false;
+    }
+
+    private getPlayCardList() : Array<Card> {
+      let cardCodeList : Array<string> = new Array();
+      this.playCardSet.forEach((element : cc.Node) => {
+        element.getComponent(cc.Sprite).spriteFrame.name;
+        cardCodeList.push(element.getComponent(cc.Sprite).spriteFrame.name);
+      });
+
+      return convertCodeListToClientCardList(cardCodeList);
+    }
+
+    private removePlayCardList() : void {
+      this.playCardSet.forEach((element : cc.Node) => {
+        let parentNode : cc.Node = element.getParent();
+        parentNode.removeChild(element);
+      });
+      this.playCardSet.clear();
+    }
+
+    public doNotPlayCard() : void {
+      HttpManager.post(null, UrlConstant.ROOM_DO_NOT_PLAY_CARD);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+      robLandlordNode.children[0].active = false;
+    }
 }
+
