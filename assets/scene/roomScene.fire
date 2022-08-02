@@ -2181,7 +2181,7 @@
       "__id__": 2
     },
     "component": "RoomController",
-    "handler": "doRobLandlord",
+    "handler": "doPlayCard",
     "customEventData": ""
   },
   {
@@ -2441,7 +2441,7 @@
       "__id__": 2
     },
     "component": "RoomController",
-    "handler": "doNotRobLandlord",
+    "handler": "doNotPlayCard",
     "customEventData": ""
   },
   {
