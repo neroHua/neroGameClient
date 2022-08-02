@@ -186,6 +186,10 @@ export default class RoomController extends cc.Component {
         let cardList : Array<Card> = convertServerCardNameListToClientCardList(cardEnumerationList);
         this.dealDealLandlordCardMessage(userId, cardList);
       }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_START_TO_PLAY_CARD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        this.dealUserStartToPlayCardMessage(userId);
+      }
     }
 
     public dealUserJoinRoomMessage(userId : string) : void {
@@ -349,6 +353,7 @@ export default class RoomController extends cc.Component {
         });
         this.showCardListForOther(userCardList, seatIndex, userIndex);
       }
+      this.hideAllRobLandlordButton();
     }
 
     public showLandlordCardList(cardList : Array<Card>) : void {
@@ -364,6 +369,14 @@ export default class RoomController extends cc.Component {
         landlordCardListNode.addChild(cardNode);
       }
       landlordCardListNode.active = true;
+    }
+
+    public dealUserStartToPlayCardMessage(userId : string) : void {
+      let seatIndex = this.findUserSeatIndexInUserListByUserId(userId);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
+      let playCardNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+      playCardNode.active = true;
     }
 
     public changePrepareStatus() : void {
