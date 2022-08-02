@@ -20,4 +20,8 @@ export default class UrlConstant {
 
   public static readonly ROOM_DO_NOT_ROB_LANDLORD : string = 'room/doNotRobLandlord';
 
+  public static readonly ROOM_DO_PLAY_CARD : string = 'room/doPlayCard';
+
+  public static readonly ROOM_DO_NOT_PLAY_CARD : string = 'room/doNotPlayCard';
+
 }
