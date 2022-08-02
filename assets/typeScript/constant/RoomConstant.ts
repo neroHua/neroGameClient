@@ -26,4 +26,8 @@ export default class RoomConstant {
 
   public static readonly PLAY_CARD : string = "playCard";
 
+  public static readonly PLAY_CARD_NOT_CHOOSE_COLOR : cc.Color = new cc.Color(255, 255, 255, 255);
+
+  public static readonly PLAY_CARD_CHOOSE_COLOR : cc.Color = new cc.Color(149, 157, 214, 255);
+
 }
