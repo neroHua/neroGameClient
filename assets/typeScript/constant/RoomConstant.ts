@@ -23,4 +23,7 @@ export default class RoomConstant {
   public static readonly DO_NOT_ROB_LANDLORD : string = "不抢地主";
 
   public static readonly LANDLORD_CARD_LIST_NODE_NAME : string = "landlordCardList";
+
+  public static readonly PLAY_CARD : string = "playCard";
+
 }
