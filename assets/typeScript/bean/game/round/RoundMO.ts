@@ -1,10 +1,13 @@
 import Card from "../../../enumeration/CardEnumeration";
+import PlayCardType from "../../../enumeration/PlayCardTypeEnumeration";
 
 export default class RoundMO {
 
   private currentTurnUserId : string ;
 
   private palyCardList : Array<Array<Card>> = new Array();
+
+  private palyCardTypeList : Array<PlayCardType> = new Array();
 
   constructor(currentTurnUserId : string) {
     this.currentTurnUserId = currentTurnUserId;
@@ -18,12 +21,14 @@ export default class RoundMO {
     this.currentTurnUserId = currentTurnUserId;
   }
 
-  public doPlayCard(cardList : Array<Card>) : void {
+  public doPlayCard(cardList : Array<Card>, playCardType : PlayCardType) : void {
     this.palyCardList.push(cardList);
+    this.palyCardTypeList.push(playCardType);
   }
 
   public doNotPlayCard() : void {
     this.palyCardList.push(null);
+    this.palyCardTypeList.push(null);
   }
 
   public thisRoundFinish(maxUserCount : number) : boolean {
@@ -48,6 +53,20 @@ export default class RoundMO {
     for (let i = this.palyCardList.length; i >= 0; i--) {
       if (null != this.palyCardList[i]) {
         return this.palyCardList[i];
+      }
+    }
+
+    return null;
+  }
+
+  public getLastPlayCardType() : PlayCardType {
+    if (null == this.palyCardTypeList) {
+      return null;
+    }
+
+    for (let i = this.palyCardTypeList.length; i >= 0; i--) {
+      if (null != this.palyCardTypeList[i]) {
+        return this.palyCardTypeList[i];
       }
     }
 
