@@ -20,7 +20,11 @@ export default class CardUtil {
 
   public static playCardTypeValidateMap : Map<PlayCardType, PlayCardTypeValidate> = new Map();
 
-  static {
+  public static initPlayCardTypeValidateMap() : void {
+    if (this.playCardTypeValidateMap.size > 0) {
+      return;
+    }
+
     let playCardTypeValidate : PlayCardTypeValidate = new SingleValidate();
     this.playCardTypeValidateMap.set(playCardTypeValidate.getPlayCardTypeEnumeration(), playCardTypeValidate);
     playCardTypeValidate = new StraightValidate();
@@ -88,7 +92,7 @@ export default class CardUtil {
   }
 
   public static generateOtherUserCard(cardList : Array<Card>) : Array<Card> {
-    let otherUserCard : Array<Card> = new Array<Card>();
+    let otherUserCard : Array<Card> = new Array();
     for (let i = 0; i < cardList.length; i++) {
       otherUserCard.push(CardEnumeration.CARD_500);
     }
@@ -99,6 +103,8 @@ export default class CardUtil {
     let maxSameValueCardCount : number = this.formatCardList(playCardList);
 
     let playCardTypeMap : Map<PlayCardType, Array<Card>> = new Map();
+
+    this.initPlayCardTypeValidateMap();
 
     let size : number = playCardList.length;
     if (1 == maxSameValueCardCount) {
