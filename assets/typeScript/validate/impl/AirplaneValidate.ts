@@ -1,6 +1,5 @@
-import CardEnumeration from "../../enumeration/CardEnumeration";
-import PlayCardType from "../../enumeration/PlayCardTypeEnumeration";
-import PlayCardTypeEnumeration from "../../enumeration/PlayCardTypeEnumeration";
+import Card, { CardEnumeration } from "../../enumeration/CardEnumeration";
+import PlayCardType, { PlayCardTypeEnumeration } from "../../enumeration/PlayCardTypeEnumeration";
 import PlayCardTypeValidate from "../PlayCardTypeValidate";
 
 export default class AirplaneValidate implements PlayCardTypeValidate {
@@ -9,10 +8,10 @@ export default class AirplaneValidate implements PlayCardTypeValidate {
   private readonly GROUP_COUNT : number = 3;
 
   getPlayCardTypeEnumeration(): PlayCardType {
-    return PlayCardTypeEnumeration['AIRPLANE'];
+    return PlayCardTypeEnumeration.AIRPLANE;
   }
 
-  match(cardEnumerationList: Array<CardEnumeration>): boolean {
+  match(cardEnumerationList: Array<Card>): boolean {
     if (cardEnumerationList.length < this.MIN_COUNT) {
       return false;
     }
@@ -34,7 +33,7 @@ export default class AirplaneValidate implements PlayCardTypeValidate {
       }
     }
 
-    if (cardEnumerationList[0].getValue() >= CardEnumeration['CARD_415'].getValue()) {
+    if (cardEnumerationList[0].getValue() >= CardEnumeration.CARD_415.getValue()) {
       return false;
     }
 
