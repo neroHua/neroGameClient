@@ -13,6 +13,7 @@ import UrlConstant from "./constant/UrlConstant";
 import UserConvert from "./convert/UserConvert";
 import Card, { CardEnumeration, convertClientCardListToServerCardNameList, convertCodeListToClientCardList, convertServerCardNameListToClientCardList } from "./enumeration/CardEnumeration";
 import { MessageTypeEnumeration } from "./enumeration/MessageTypeEnumeration";
+import PlayCardType from "./enumeration/PlayCardTypeEnumeration";
 import HttpManager from "./net/HttpManager";
 import CardUtil from "./util/CardUtil";
 
@@ -66,7 +67,6 @@ export default class RoomController extends cc.Component {
     let i: number = 0;
     for (i = 0; i < this.userList.length; i++) {
       let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
-      console.log(userNode);
       let userInforMationNode = userNode.getChildByName(RoomConstant.USER_INFORMATION_NODE_NAME);
       userInforMationNode.getComponent(cc.Label).string = this.userList[i].getUserId();
 
@@ -242,7 +242,7 @@ export default class RoomController extends cc.Component {
       this.showCardListForMe(cardList);
       this.showCardListForAllOther(cardList);
 
-      CardUtil.sortOneCardList(0, cardList.length - 1, cardList);
+      CardUtil.quickSortOneCardList(0, cardList.length - 1, cardList);
       this.showCardListForMe(cardList);
     }
 
@@ -347,7 +347,7 @@ export default class RoomController extends cc.Component {
     }
 
     public dealDealLandlordCardMessage(userId : string, cardList : Array<Card>) : void {
-      CardUtil.sortOneCardList(0, cardList.length - 1, cardList);
+      CardUtil.quickSortOneCardList(0, cardList.length - 1, cardList);
 
       this.showLandlordCardList(cardList);
 
@@ -360,7 +360,7 @@ export default class RoomController extends cc.Component {
         cardList.forEach( element => {
           userCardList.push(element);
         });
-        CardUtil.sortOneCardList(0, userCardList.length - 1, userCardList);
+        CardUtil.quickSortOneCardList(0, userCardList.length - 1, userCardList);
         this.showCardListForMe(userCardList);
       }
       else {
@@ -446,15 +446,35 @@ export default class RoomController extends cc.Component {
     public doPlayCard() : void {
       let cardList : Array<Card> = this.getPlayCardList();
       let lastCardList : Array<Card> = this.roundMO.getLastPlayCard();
+      let lastPlayCardType : PlayCardType = this.roundMO.getLastPlayCardType();
 
-      if (CardUtil.canNotPlayThisCard(cardList, lastCardList)) {
+      let playCardTypeMap : Map<PlayCardType, Array<Card>> = CardUtil.generalCalculatePlayCardType(cardList) ;
+
+      if (0 === playCardTypeMap.size) {
+        console.log('不合法的牌型');
+        return;
+      }
+      else if (playCardTypeMap.size > 1) {
+        console.log('请选择牌型');
+        return;
+      }
+
+      let playCardType : PlayCardType = null;
+      playCardTypeMap.forEach((value : Array<Card>, key : PlayCardType) => {
+        playCardType = key;
+        cardList = value;
+      });
+
+
+      if (!CardUtil.firstCardListBiggerThanSecondCardList(cardList, playCardType, lastCardList, lastPlayCardType)) {
+        console.log('您出的牌太小了')
         return;
       }
 
       let serverCardNameList : Array<string> = convertClientCardListToServerCardNameList(cardList);
-      let userPlayCardRequest : UserPlayCardRequest = new UserPlayCardRequest(serverCardNameList);
+      let userPlayCardRequest : UserPlayCardRequest = new UserPlayCardRequest(serverCardNameList, playCardType.getServerCardName());
       HttpManager.post(userPlayCardRequest, UrlConstant.ROOM_DO_PLAY_CARD);
-      this.removePlayCardList();
+      this.removePlayCardList(cardList);
 
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
       let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
@@ -471,12 +491,24 @@ export default class RoomController extends cc.Component {
       return convertCodeListToClientCardList(cardCodeList);
     }
 
-    private removePlayCardList() : void {
+    private removePlayCardList(cardList : Array<Card>) : void {
       this.playCardSet.forEach((element : cc.Node) => {
         let parentNode : cc.Node = element.getParent();
         parentNode.removeChild(element);
       });
+
       this.playCardSet.clear();
+      let meIndex : number = this.findMeIndexInUserList();
+      let me : GameUserMO = this.userList[meIndex];
+      let handCardList : Array<Card> = me.getCardList();
+      for (let i : number = 0; i < cardList.length; i++) {
+        for (let j : number = 0; j < handCardList.length; j++) {
+          if (handCardList[j] === cardList[i]) {
+            handCardList.splice(j, 1);
+            break;
+          }
+        }
+      }
     }
 
     public doNotPlayCard() : void {
