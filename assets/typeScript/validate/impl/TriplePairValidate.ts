@@ -1,6 +1,5 @@
-import CardEnumeration from "../../enumeration/CardEnumeration";
-import PlayCardType from "../../enumeration/PlayCardTypeEnumeration";
-import PlayCardTypeEnumeration from "../../enumeration/PlayCardTypeEnumeration";
+import Card, { CardEnumeration } from "../../enumeration/CardEnumeration";
+import PlayCardType, { PlayCardTypeEnumeration } from "../../enumeration/PlayCardTypeEnumeration";
 import PlayCardTypeValidate from "../PlayCardTypeValidate";
 
 export default class TriplePairValidate implements PlayCardTypeValidate {
@@ -8,10 +7,10 @@ export default class TriplePairValidate implements PlayCardTypeValidate {
   private readonly COUNT : number = 5;
 
   getPlayCardTypeEnumeration(): PlayCardType {
-    return PlayCardTypeEnumeration['TRIPLE_PAIR'];
+    return PlayCardTypeEnumeration.TRIPLE_PAIR;
   }
 
-  match(cardEnumerationList: Array<CardEnumeration>): boolean {
+  match(cardEnumerationList: Array<Card>): boolean {
     if (this.COUNT != cardEnumerationList.length) {
       return false;
     }
