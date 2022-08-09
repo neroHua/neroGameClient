@@ -272,7 +272,20 @@ export default class CardUtil {
     return anotherTypeCardList;
   }
 
-  public static canNotPlayThisCard(cardList: Card[], lastCardList: Card[]) : boolean {
+  public static firstCardListBiggerThanSecondCardList(playCardList1 : Array<Card>, playCardTypeEnumeration1 : PlayCardType, playCardList2 : Array<Card>, playCardTypeEnumeration2 : PlayCardType) : boolean {
+    if (null == playCardTypeEnumeration2) {
+      return true;
+    }
+
+    if (playCardTypeEnumeration1.getValue() > playCardTypeEnumeration2.getValue()) {
+        return true;
+    }
+    else if (playCardTypeEnumeration1.getValue() < playCardTypeEnumeration2.getValue()) {
+        return false;
+    }
+    else if (playCardTypeEnumeration1 === playCardTypeEnumeration2) {
+        return playCardList1[0].getValue() > playCardList2[0].getValue();
+    }
     return false;
   }
 
