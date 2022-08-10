@@ -315,7 +315,7 @@ export default class RoomController extends cc.Component {
       let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
       let cardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
       cardListNode.removeAllChildren();
-      for (let i = 1; i < otherCardList.length; i++) {
+      for (let i = 0; i < otherCardList.length; i++) {
         let cardNode = new cc.Node();
         cardNode.y = cardListNode.y;
 
@@ -412,6 +412,21 @@ export default class RoomController extends cc.Component {
       landlordCardListNode.active = true;
     }
 
+    public showPlayCardList(cardList : Array<Card>) : void {
+      let playCardListNode : cc.Node = this.node.getChildByName(RoomConstant.PLAY_CARD_LIST_NODE_NAME);
+      playCardListNode.removeAllChildren();
+      for (let i = 0; i < cardList.length; i++) {
+        let cardNode = new cc.Node();
+        cardNode.y = playCardListNode.y;
+
+        let cardSprite : cc.Sprite = cardNode.addComponent(cc.Sprite);
+        cardSprite.spriteFrame = this.cardAtlas.getSpriteFrame(cardList[i].getCode());
+
+        playCardListNode.addChild(cardNode);
+      }
+      playCardListNode.active = true;
+    }
+
     public dealUserStartToPlayCardMessage(userId : string) : void {
       let seatIndex : number = this.findUserSeatIndexInUserListByUserId(userId);
 
@@ -461,6 +476,8 @@ export default class RoomController extends cc.Component {
       for (let i : number = 0, j = palyCardListNode.children.length - 1; i < cardList.length; i++, j--) {
         palyCardListNode.removeChild(palyCardListNode.children[j]);
       }
+
+      this.showPlayCardList(cardList);
     }
 
     public dealUserDoNotPlayCardMessage(userId : string) : void {
@@ -543,16 +560,18 @@ export default class RoomController extends cc.Component {
         return;
       }
 
+      this.roundMO.doPlayCard(cardList, playCardType);
+
       let serverCardNameList : Array<string> = convertClientCardListToServerCardNameList(cardList);
       let userPlayCardRequest : UserPlayCardRequest = new UserPlayCardRequest(serverCardNameList, playCardType.getServerCardName());
       HttpManager.post(userPlayCardRequest, UrlConstant.ROOM_DO_PLAY_CARD);
       this.removePlayCardList(cardList);
 
-      this.roundMO.doPlayCard(cardList, playCardType);
-
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
-      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
-      robLandlordNode.children[1].active = false;
+      let playCardNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+      playCardNode.children[1].active = false;
+
+      this.showPlayCardList(cardList);
     }
 
     private getPlayCardList() : Array<Card> {
