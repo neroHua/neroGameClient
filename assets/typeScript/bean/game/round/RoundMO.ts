@@ -36,8 +36,8 @@ export default class RoundMO {
       return false;
     }
 
-    for (let i = 0; i < maxUserCount - 1; i++) {
-      if (null == this.palyCardList[this.palyCardList.length - 1 - i]) {
+    for (let i : number = 0, j : number = this.palyCardList.length - 1; i < maxUserCount - 1; i++, j--) {
+      if (null !== this.palyCardList[j]) {
           return false;
       }
     }
