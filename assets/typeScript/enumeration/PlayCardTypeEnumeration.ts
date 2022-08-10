@@ -39,7 +39,7 @@ export const PlayCardTypeEnumeration = {
   STRAIGHT: new PlayCardType("STRAIGHT", "straight", 0, "顺子"),
 
   PAIR: new PlayCardType("PAIR", "pair", 0, "对子"),
-  PAIR_STRAIGHT: new PlayCardType("pairStraight", "card_106", 0, "连对"),
+  PAIR_STRAIGHT: new PlayCardType("PAIR_STRAIGHT", "pairStraight", 0, "连对"),
 
   TRIPLE: new PlayCardType("TRIPLE", "triple", 0, "三不带"),
   TRIPLE_SINGLE: new PlayCardType("TRIPLE_SINGLE", "tripleSingle", 0, "三带一"),
@@ -54,4 +54,8 @@ export const PlayCardTypeEnumeration = {
 
   BOMB: new PlayCardType("BOMB", "bomb", 1, "炸弹"),
   BOMB_KING: new PlayCardType("BOMB_KING", "bombKing", 2, "王炸"),
+}
+
+export const convertServerPlayCardTypeNameToClientPlayCardType = (serverPlayCardTypeName : string) : PlayCardType => {
+  return PlayCardTypeEnumeration[serverPlayCardTypeName];
 }
