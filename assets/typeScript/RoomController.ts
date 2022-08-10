@@ -13,7 +13,7 @@ import UrlConstant from "./constant/UrlConstant";
 import UserConvert from "./convert/UserConvert";
 import Card, { CardEnumeration, convertClientCardListToServerCardNameList, convertCodeListToClientCardList, convertServerCardNameListToClientCardList } from "./enumeration/CardEnumeration";
 import { MessageTypeEnumeration } from "./enumeration/MessageTypeEnumeration";
-import PlayCardType from "./enumeration/PlayCardTypeEnumeration";
+import PlayCardType, { convertServerPlayCardTypeNameToClientPlayCardType } from "./enumeration/PlayCardTypeEnumeration";
 import HttpManager from "./net/HttpManager";
 import CardUtil from "./util/CardUtil";
 
@@ -61,38 +61,44 @@ export default class RoomController extends cc.Component {
       this.rearrangeUserSeat();
     }
 
-  private rearrangeUserSeat() {
-    let meIndex = this.findMeIndexInUserList();
+    private rearrangeUserSeat() {
+      let meIndex = this.findMeIndexInUserList();
 
-    let i: number = 0;
-    for (i = 0; i < this.userList.length; i++) {
-      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
-      let userInforMationNode = userNode.getChildByName(RoomConstant.USER_INFORMATION_NODE_NAME);
-      userInforMationNode.getComponent(cc.Label).string = this.userList[i].getUserId();
+      let i: number = 0;
+      for (i = 0; i < this.userList.length; i++) {
+        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
+        let userInforMationNode = userNode.getChildByName(RoomConstant.USER_INFORMATION_NODE_NAME);
+        userInforMationNode.getComponent(cc.Label).string = this.userList[i].getUserId();
 
-      let preparedNode = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
-      if (this.userList[i].getPrepared()) {
-        preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_YES;
+        let preparedNode = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
+        if (this.userList[i].getPrepared()) {
+          preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_YES;
+        }
+        else {
+          preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_NO;
+        }
       }
-      else {
-        preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_NO;
+
+      for (; i < this.MAX_USER_COUNT; i++) {
+        let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
+        userNode.active = false;
       }
+
+      this.hideAllRobLandlordButton();
+      this.hideAllPlayCardButton();
     }
 
-    for (; i < this.MAX_USER_COUNT; i++) {
-      let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + this.calculateSeatIndexByMeIndex(i, meIndex));
-      userNode.active = false;
+    private findMeIndexInUserList() : number {
+      let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
+      let userInformation = JSON.parse(userInformationString);
+      return this.findUserIndexInUserListByUserId(userInformation.userId);
     }
 
-    this.hideAllRobLandlordButton();
-    this.hideAllPlayCardButton();
-  }
-
-  private findMeIndexInUserList() : number {
-    let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
-    let userInformation = JSON.parse(userInformationString);
-    return this.findUserIndexInUserListByUserId(userInformation.userId);
-  }
+    private thisUserIdIsMe(userId : string) : boolean {
+      let userInformationString = cc.sys.localStorage.getItem(LocalStorageConstant.USER_INFORMATION);
+      let userInformation = JSON.parse(userInformationString);
+      return userInformation.userId === userId;
+    }
 
     public findUserIndexInUserListByUserId(userId : string) : number {
       for (let i = 0; i < this.userList.length; i++) {
@@ -129,8 +135,11 @@ export default class RoomController extends cc.Component {
     private hideAllPlayCardButton() : void {
       for (let j = 0; j < this.MAX_USER_COUNT; j++) {
         let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
-        let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
-        robLandlordNode.active = false;
+        let playCardNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+        playCardNode.active = false;
+        for (let i : number = 0; i < playCardNode.children.length; i++) {
+          playCardNode.children[i].active = false;
+        }
       }
     }
 
@@ -196,6 +205,21 @@ export default class RoomController extends cc.Component {
         let userId : string = messageObject.userId;
         this.dealUserStartToPlayCardMessage(userId);
       }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_DO_PLAY_CARD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+        let cardEnumerationList : Array<string> = messageObject.cardEnumerationList;
+        let playCardTypeEnumeration : string = messageObject.playCardTypeEnumeration;
+
+        let cardList : Array<Card> = convertServerCardNameListToClientCardList(cardEnumerationList);
+        let playCardType : PlayCardType = convertServerPlayCardTypeNameToClientPlayCardType(playCardTypeEnumeration);
+        this.dealUserDoPlayCardMessage(userId, cardList, playCardType);
+      }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_DO_NOT_PLAY_CARD.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+
+        this.dealUserDoNotPlayCardMessage(userId);
+      }
+
     }
 
     public dealUserJoinRoomMessage(userId : string) : void {
@@ -389,18 +413,66 @@ export default class RoomController extends cc.Component {
     }
 
     public dealUserStartToPlayCardMessage(userId : string) : void {
-      if (null == this.roundMO || this.roundMO.thisRoundFinish(this.MAX_USER_COUNT)) {
-        this.roundMO = new RoundMO(userId);
-      }
-      else {
-        this.roundMO.setCurrentTurnUserId(userId);
-      }
-
-      let seatIndex = this.findUserSeatIndexInUserListByUserId(userId);
+      let seatIndex : number = this.findUserSeatIndexInUserListByUserId(userId);
 
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
       let playCardNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+
+      if (this.thisUserIdIsMe(userId)) {
+        if (null == this.roundMO || this.roundMO.thisRoundFinish(this.MAX_USER_COUNT)) {
+          this.hideAllPlayCardButton();
+          this.roundMO = new RoundMO(userId);
+          playCardNode.children[0].active = true;
+          playCardNode.children[1].active = false;
+        }
+        else {
+          this.roundMO.setCurrentTurnUserId(userId);
+          playCardNode.children[0].active = true;
+          playCardNode.children[1].active = true;
+        }
+        playCardNode.active = true;
+      }
+      else {
+        if (null == this.roundMO || this.roundMO.thisRoundFinish(this.MAX_USER_COUNT)) {
+          this.hideAllPlayCardButton();
+          this.roundMO = new RoundMO(userId);
+        }
+        else {
+          this.roundMO.setCurrentTurnUserId(userId);
+        }
+        playCardNode.children[0].getComponent(cc.Label).string = RoomConstant.IN_PALY_CARD;
+        playCardNode.children[0].active = true;
+        playCardNode.active = true;
+      }
+    }
+
+    public dealUserDoPlayCardMessage(userId : string, cardList : Array<Card>, playCardType : PlayCardType) : void {
+      let seatIndex : number = this.findUserSeatIndexInUserListByUserId(userId);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
+      let playCardNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+      let palyCardListNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
+
+      this.roundMO.doPlayCard(cardList, playCardType);
+
       playCardNode.active = true;
+      playCardNode.children[0].getComponent(cc.Label).string = RoomConstant.DO_PALY_CARD;
+
+      for (let i : number = 0, j = palyCardListNode.children.length - 1; i < cardList.length; i++, j--) {
+        palyCardListNode.removeChild(palyCardListNode.children[j]);
+      }
+    }
+
+    public dealUserDoNotPlayCardMessage(userId : string) : void {
+      let seatIndex : number = this.findUserSeatIndexInUserListByUserId(userId);
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
+      let playCardNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
+
+      this.roundMO.doNotPlayCard();
+
+      playCardNode.active = true;
+      playCardNode.children[0].getComponent(cc.Label).string = RoomConstant.DO_NOT_PLAY_CARD;
     }
 
     public changePrepareStatus() : void {
@@ -476,6 +548,8 @@ export default class RoomController extends cc.Component {
       HttpManager.post(userPlayCardRequest, UrlConstant.ROOM_DO_PLAY_CARD);
       this.removePlayCardList(cardList);
 
+      this.roundMO.doPlayCard(cardList, playCardType);
+
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
       let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
       robLandlordNode.children[1].active = false;
@@ -512,6 +586,7 @@ export default class RoomController extends cc.Component {
     }
 
     public doNotPlayCard() : void {
+      this.roundMO.doNotPlayCard();
       HttpManager.post(null, UrlConstant.ROOM_DO_NOT_PLAY_CARD);
 
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
