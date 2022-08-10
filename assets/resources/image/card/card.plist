@@ -631,7 +631,7 @@
             <key>card_516.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{710,2},{116,159}}</string>
+                <string>{{592,2},{116,159}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -644,7 +644,7 @@
             <key>card_517.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{592,2},{116,159}}</string>
+                <string>{{710,2},{116,159}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
