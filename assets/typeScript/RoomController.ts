@@ -477,7 +477,7 @@ export default class RoomController extends cc.Component {
       this.removePlayCardList(cardList);
 
       let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
-      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.ROB_LANDLORD);
+      let robLandlordNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD);
       robLandlordNode.children[1].active = false;
     }
 
