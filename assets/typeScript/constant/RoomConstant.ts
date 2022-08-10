@@ -30,4 +30,10 @@ export default class RoomConstant {
 
   public static readonly PLAY_CARD_CHOOSE_COLOR : cc.Color = new cc.Color(149, 157, 214, 255);
 
+  public static readonly IN_PALY_CARD : string = "出牌中";
+
+  public static readonly DO_PALY_CARD : string = "已出牌";
+
+  public static readonly DO_NOT_PLAY_CARD : string = "不出牌";
+
 }
