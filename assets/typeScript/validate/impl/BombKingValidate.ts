@@ -15,8 +15,8 @@ export default class BombKingValidate implements PlayCardTypeValidate {
       return false;
     }
 
-    return cardEnumerationList[0].getValue() === CardEnumeration.CARD_516.getValue()
-      && cardEnumerationList[1].getValue() === CardEnumeration.CARD_517.getValue();
+    return cardEnumerationList[0].getValue() === CardEnumeration.CARD_517.getValue()
+      && cardEnumerationList[1].getValue() === CardEnumeration.CARD_516.getValue();
   }
 
 }
