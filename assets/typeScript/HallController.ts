@@ -1,8 +1,10 @@
 import HttpResponse from "./bean/http/HttpResponse";
+import CreateRequest from "./bean/http/room/CreateRequest";
 import JoinRequest from "./bean/http/room/JoinRequest";
 import LocalStorageConstant from "./constant/LocalStorageConstant";
 import SceneConstant from "./constant/SceneConstant";
 import UrlConstant from "./constant/UrlConstant";
+import { GameTypeEnumeration } from "./enumeration/GameTypeEnumeration";
 import HttpManager from "./net/HttpManager";
 
 const {ccclass, property} = cc._decorator;
@@ -24,7 +26,8 @@ export default class HallController extends cc.Component {
     }
 
     onCreateRoom() {
-      let roomIdResponse : HttpResponse<number> = HttpManager.post(null, UrlConstant.ROOM_CREATE);
+      let createRoomRequest = new CreateRequest(GameTypeEnumeration.FIGHT_LANDLORD_FOR_THREE);
+      let roomIdResponse : HttpResponse<number> = HttpManager.post(createRoomRequest, UrlConstant.ROOM_CREATE);
 
       cc.sys.localStorage.setItem(LocalStorageConstant.ROOM_ID, roomIdResponse.data);
 
