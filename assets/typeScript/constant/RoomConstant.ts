@@ -14,6 +14,8 @@ export default class RoomConstant {
 
   public static readonly CARD_LIST_NODE_NAME : string = "cardList";
 
+  public static readonly CARD_COUNT_NODE_NAME : string = "cardCount";
+
   public static readonly PLAY_CARD_LIST_NODE_NAME : string = "playCardList";
 
   public static readonly ROB_LANDLORD : string = "robLandlord";
