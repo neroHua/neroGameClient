@@ -159,6 +159,20 @@ export default class RoomController extends cc.Component {
       }
     }
 
+    private hideAllPlayCardList() : void {
+      for (let j = 0; j < this.MAX_USER_COUNT; j++) {
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+        let cardCountNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD_LIST_NODE_NAME);
+        cardCountNode.removeAllChildren();
+        cardCountNode.active = false;
+      }
+    }
+
+    private cleanLandLordCardList() : void {
+      let landlordCardListNode : cc.Node = this.node.getChildByName(RoomConstant.LANDLORD_CARD_LIST_NODE_NAME);
+      landlordCardListNode.removeAllChildren();
+    }
+
     private initCardAtlas() {
       cc.loader.loadRes(ResourceConstant.CARD_LIST_ATLAS_URL, cc.SpriteAtlas, (error, resources) => {
         this.cardAtlas = resources;
@@ -234,6 +248,11 @@ export default class RoomController extends cc.Component {
         let userId : string = messageObject.userId;
 
         this.dealUserDoNotPlayCardMessage(userId);
+      }
+      else if (messageObject.messageTypeEnumeration === MessageTypeEnumeration.USER_WIN.getServerMessageName()) {
+        let userId : string = messageObject.userId;
+
+        this.dealUserWinMessage(userId);
       }
 
     }
@@ -510,6 +529,34 @@ export default class RoomController extends cc.Component {
 
       let playCardListNode : cc.Node = userNode.getChildByName(RoomConstant.PLAY_CARD_LIST_NODE_NAME);
       playCardListNode.removeAllChildren();
+    }
+
+    public dealUserWinMessage(userId : string) : void {
+      this.hideAllCardCount();
+      this.hideAllPlayCardList();
+      this.hideAllPlayCardButton();
+      this.cleanLandLordCardList();
+
+      if (userId === UserUtil.getMyUserId()) {
+        console.log('you win');
+      }
+      else {
+        console.log('you lose')
+      }
+
+      for (let i = 0; i < this.userList.length; i++) {
+        this.userList[i].clean();
+      }
+      for (let i = 0; i < this.MAX_USER_COUNT; i++) {
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + i);
+        let preparedNode : cc.Node = userNode.getChildByName(RoomConstant.PREPARE_NODE_NAME);
+        preparedNode.children[0].getComponent(cc.Label).string = RoomConstant.PREPARE_NODE_LABEL_NO;
+        preparedNode.active = true;
+      }
+
+      let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_ME);
+      let cardNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_LIST_NODE_NAME);
+      cardNode.removeAllChildren();
     }
 
     public changePrepareStatus() : void {
