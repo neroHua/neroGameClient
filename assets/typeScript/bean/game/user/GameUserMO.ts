@@ -44,4 +44,10 @@ export default class GameUserMO {
     this.score = score;
   }
 
+  public clean() : void {
+    this.prepared = false;
+    this.cardList = null;
+    this.score = 0;
+  }
+
 }
