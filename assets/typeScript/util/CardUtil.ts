@@ -114,7 +114,7 @@ export default class CardUtil {
         else if (2 == size) {
             let playCardTypeValidate : PlayCardTypeValidate = this.playCardTypeValidateMap.get(PlayCardTypeEnumeration.BOMB_KING);
             if (playCardTypeValidate.match(playCardList)) {
-                playCardTypeMap.set(PlayCardTypeEnumeration.SINGLE, playCardList);
+                playCardTypeMap.set(PlayCardTypeEnumeration.BOMB_KING, playCardList);
             }
         }
         else if (size >= 5) {
