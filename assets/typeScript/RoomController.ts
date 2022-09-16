@@ -311,15 +311,19 @@ export default class RoomController extends cc.Component {
     public showCardListForAllOther(cardList : Array<Card>) : void {
       let meIndex = this.findMeIndexInUserList();
       for (let j = 1; j < this.MAX_USER_COUNT; j++) {
-        this.showCardListForOther(cardList, j, this.calculateUserIndexByMeIndex(j, meIndex));
+        this.initCardListForOther(cardList, j, this.calculateUserIndexByMeIndex(j, meIndex));
       }
     }
 
-    public showCardListForOther(cardList : Array<Card>, seatIndex : number, userIndex : number) : void {
+    public initCardListForOther(cardList : Array<Card>, seatIndex : number, userIndex : number) : void {
       let otherCardList : Array<Card> = CardUtil.generateOtherUserCard(cardList);
       this.userList[userIndex].setCardList(otherCardList);
 
       let userNode = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
+      this.showCardListCountForOther(otherCardList, userNode);
+    }
+
+    public showCardListCountForOther(cardList : Array<Card>, userNode : cc.Node) : void {
       let cardCountNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_COUNT_NODE_NAME);
       let innerCardCountNode : cc.Node = cardCountNode.getChildByName(RoomConstant.CARD_COUNT_NODE_NAME);
       innerCardCountNode.getComponent(cc.Label).string = cardList.length.toString();
@@ -393,7 +397,8 @@ export default class RoomController extends cc.Component {
         cardList.forEach( element => {
           userCardList.push(element);
         });
-        this.showCardListForOther(userCardList, seatIndex, userIndex);
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + seatIndex);
+        this.showCardListCountForOther(userCardList, userNode);
       }
       this.hideAllRobLandlordButton();
     }
@@ -476,6 +481,11 @@ export default class RoomController extends cc.Component {
       playCardNode.active = false;
 
       this.showPlayCardList(userNode, cardList);
+
+      let userIndex : number = this.findUserIndexInUserListByUserId(userId);
+      let userCardList : Array<Card> = this.userList[userIndex].getCardList();
+      userCardList.splice(userCardList.length - cardList.length);
+      this.showCardListCountForOther(userCardList, userNode);
     }
 
     public dealUserDoNotPlayCardMessage(userId : string) : void {
