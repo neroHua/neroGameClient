@@ -87,6 +87,7 @@ export default class RoomController extends cc.Component {
 
       this.hideAllRobLandlordButton();
       this.hideAllPlayCardButton();
+      this.hideAllCardCount();
     }
 
     private findMeIndexInUserList() : number {
@@ -147,6 +148,14 @@ export default class RoomController extends cc.Component {
         for (let i : number = 0; i < playCardNode.children.length; i++) {
           playCardNode.children[i].active = false;
         }
+      }
+    }
+
+    private hideAllCardCount() : void {
+      for (let j = 1; j < this.MAX_USER_COUNT; j++) {
+        let userNode : cc.Node = this.node.getChildByName(RoomConstant.USER_NODE_NAME_PREFIX + j);
+        let cardCountNode : cc.Node = userNode.getChildByName(RoomConstant.CARD_COUNT_NODE_NAME);
+        cardCountNode.active = false;
       }
     }
 
