@@ -39,6 +39,7 @@ export default class RoomController extends cc.Component {
       this.initWebSocket();
       this.initUserList();
       this.initCardAtlas();
+      this.initRoundFinish();
     }
 
     private initWebSocket() {
@@ -173,10 +174,15 @@ export default class RoomController extends cc.Component {
       landlordCardListNode.removeAllChildren();
     }
 
-    private initCardAtlas() {
+    private initCardAtlas() : void {
       cc.loader.loadRes(ResourceConstant.CARD_LIST_ATLAS_URL, cc.SpriteAtlas, (error, resources) => {
         this.cardAtlas = resources;
       });
+    }
+
+    private initRoundFinish() : void {
+      let gameOverNode : cc.Node = this.node.getChildByName(RoomConstant.ROUND_FINISH_NODE_NAME);
+      gameOverNode.active = false;
     }
 
     private onOpen() {

@@ -40,4 +40,6 @@ export default class RoomConstant {
 
   public static readonly DO_NOT_PLAY_CARD : string = "不出牌";
 
+  public static readonly ROUND_FINISH_NODE_NAME : string = 'roundFinish';
+
 }
